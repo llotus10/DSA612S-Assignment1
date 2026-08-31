@@ -1,0 +1,57 @@
+{
+  "last_build_time": 1788185224291,
+  "last_update_time": 1788185224291,
+  "last_bal_toml_update_time": 1788184969966,
+  "distribution_version": "2201.13.5",
+  "last_modified_time": {
+    "library_client": 1788185195259
+  },
+  "last_build_options": {
+    "testReport": false,
+    "codeCoverage": false,
+    "skipTests": true,
+    "compilationOptions": {
+      "experimental": false,
+      "observabilityIncluded": true,
+      "cloud": "",
+      "dumpGraph": false,
+      "dumpRawGraphs": false
+    }
+  },
+  "src_meta_info": [
+    {
+      "file": "C:\\Users\\George\\Desktop\\DSA612S-Assignment1-CLEAN\\Q1-REST-Library-System\\client\\Ballerina.toml",
+      "hash": "e42cf93f14e838e8048c689b2cd66d26f851476eb14aaccb62f8350310ae0c59",
+      "size": 272,
+      "lastModifiedTime": 1788184969966
+    },
+    {
+      "file": "C:\\Users\\George\\Desktop\\DSA612S-Assignment1-CLEAN\\Q1-REST-Library-System\\client\\library_client.bal",
+      "hash": "cc521994a77dccc8d3ad0b7bd3ea5f9b1c6e35d5ce6cf07085b7897bd37e3cac",
+      "size": 5516,
+      "lastModifiedTime": 1788185195259
+    }
+  ],
+  "target_exec_meta_info": {
+    "file": "C:\\Users\\George\\Desktop\\DSA612S-Assignment1-CLEAN\\Q1-REST-Library-System\\client\\target\\backup\\bin\\library_client.jar",
+    "hash": "26d376a5b1cbdfaa83539d1cdd629f38508e4379216f7d05f6cd8ab55a4f80b6",
+    "size": 47417842,
+    "lastModifiedTime": 1788185225110
+  },
+  "settings_meta_info": {
+    "file": "C:\\Users\\George\\.ballerina\\Settings.toml",
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0,
+    "lastModifiedTime": 1787819687328
+  },
+  "ballerina_toml_meta_info": {
+    "file": "C:\\Users\\George\\Desktop\\DSA612S-Assignment1-CLEAN\\Q1-REST-Library-System\\client\\Ballerina.toml",
+    "hash": "e42cf93f14e838e8048c689b2cd66d26f851476eb14aaccb62f8350310ae0c59",
+    "size": 272,
+    "lastModifiedTime": 1788184969966
+  },
+  "imports": [
+    "ballerina/http",
+    "ballerina/io"
+  ]
+}

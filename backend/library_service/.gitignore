@@ -1,0 +1,23 @@
+# Ballerina generated files
+target/
+Ballerina.lock
+ballerina-internal.log
+ballerina.log
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.jar
+*.war
+*.class
+
+# Temporary files
+*.tmp
+*.temp
