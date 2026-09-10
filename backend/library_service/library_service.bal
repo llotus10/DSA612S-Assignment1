@@ -160,12 +160,41 @@ service /api/library on new http:Listener(9090) {
     }
     
     // POST /assets/{tag}/schedules - Add schedule
-    resource function post assets/[string tag]/schedules(@http:Payload string scheduleData) returns http:Ok|http:NotFound {
+    resource function post assets/[string tag]/schedules(@http:Payload json scheduleData) returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
         }
+        string scheduleJson = scheduleData.toJsonString();
+        if !scheduleStore.hasKey(tag) {
+            scheduleStore[tag] = [];
+        }
+        string[] schedules = [];
+        string[]? storedSchedules = scheduleStore[tag];
+        if storedSchedules is string[] {
+            schedules = storedSchedules;
+        }
+        schedules.push(scheduleJson);
+        scheduleStore[tag] = schedules;
         log:printInfo("Added schedule to: " + tag);
         return <http:Ok>{body: {"message": "Schedule added"}};
+    }
+
+    // GET /assets/{tag}/schedules - Get schedules for an asset
+    resource function get assets/[string tag]/schedules() returns string|http:NotFound {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string result = "[";
+        string[]? schedules = scheduleStore[tag];
+        if schedules is string[] {
+            foreach string schedule in schedules {
+                if result != "[" {
+                    result = result + ",";
+                }
+                result = result + schedule;
+            }
+        }
+        return result + "]";
     }
     
     // POST /assets/{tag}/components - Add component
@@ -190,6 +219,24 @@ service /api/library on new http:Listener(9090) {
     resource function delete assets/[string tag]/schedules/[string schedId]() returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string[]? schedules = scheduleStore[tag];
+        if schedules is string[] {
+            string[] remaining = [];
+            boolean removed = false;
+            foreach string schedule in schedules {
+                if getValue(schedule, "scheduleId") == schedId {
+                    removed = true;
+                } else {
+                    remaining.push(schedule);
+                }
+            }
+            if !removed {
+                return <http:NotFound>{body: {"error": "Schedule not found"}};
+            }
+            scheduleStore[tag] = remaining;
+        } else {
+            return <http:NotFound>{body: {"error": "Schedule not found"}};
         }
         log:printInfo("Removed schedule: " + schedId);
         return <http:Ok>{body: {"message": "Schedule removed"}};
