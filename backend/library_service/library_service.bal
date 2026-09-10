@@ -45,6 +45,13 @@ function isPastDate(string date) returns boolean {
     return false;
 }
 
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:8000"],
+        allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allowHeaders: ["Content-Type"]
+    }
+}
 service /api/library on new http:Listener(9090) {
     
     function init() {
