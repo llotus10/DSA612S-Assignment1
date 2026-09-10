@@ -286,12 +286,37 @@ service /api/library on new http:Listener(9090) {
     }
     
     // POST /assets/{tag}/workorders - Create work order
-    resource function post assets/[string tag]/workorders(@http:Payload string workOrderData) returns http:Ok|http:NotFound {
+    resource function post assets/[string tag]/workorders(@http:Payload json workOrderData) returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
         }
+        string[] workOrders = [];
+        string[]? storedWorkOrders = workOrderStore[tag];
+        if storedWorkOrders is string[] {
+            workOrders = storedWorkOrders;
+        }
+        workOrders.push(workOrderData.toJsonString());
+        workOrderStore[tag] = workOrders;
         log:printInfo("Created work order for: " + tag);
         return <http:Ok>{body: {"message": "Work order created"}};
+    }
+
+    // GET /assets/{tag}/workorders - Get work orders for an asset
+    resource function get assets/[string tag]/workorders() returns string|http:NotFound {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string result = "[";
+        string[]? workOrders = workOrderStore[tag];
+        if workOrders is string[] {
+            foreach string workOrder in workOrders {
+                if result != "[" {
+                    result = result + ",";
+                }
+                result = result + workOrder;
+            }
+        }
+        return result + "]";
     }
     
     // PATCH /assets/{tag}/status - Update status

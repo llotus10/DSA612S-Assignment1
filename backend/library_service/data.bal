@@ -1,6 +1,7 @@
 public map<string> assetStore = {};
 public map<string[]> scheduleStore = {};
 public map<string[]> componentStore = {};
+public map<string[]> workOrderStore = {};
 
 public function initSampleData() {
     assetStore["NUST-LIB-3DP-001"] = "{\"assetTag\":\"NUST-LIB-3DP-001\",\"name\":\"Pro-Series 3D Printer\",\"description\":\"High-precision laboratory printer\",\"institution\":\"Namibia University of Science and Technology\",\"site\":\"Main Campus - Innovation Lab\",\"status\":\"AVAILABLE\",\"dateAcquired\":\"2024-03-10\"}";
