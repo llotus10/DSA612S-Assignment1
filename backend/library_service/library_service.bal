@@ -198,18 +198,61 @@ service /api/library on new http:Listener(9090) {
     }
     
     // POST /assets/{tag}/components - Add component
-    resource function post assets/[string tag]/components(@http:Payload string componentData) returns http:Ok|http:NotFound {
+    resource function post assets/[string tag]/components(@http:Payload json componentData) returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
         }
+        string[] components = [];
+        string[]? storedComponents = componentStore[tag];
+        if storedComponents is string[] {
+            components = storedComponents;
+        }
+        components.push(componentData.toJsonString());
+        componentStore[tag] = components;
         log:printInfo("Added component to: " + tag);
         return <http:Ok>{body: {"message": "Component added"}};
+    }
+
+    // GET /assets/{tag}/components - Get components for an asset
+    resource function get assets/[string tag]/components() returns string|http:NotFound {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string result = "[";
+        string[]? components = componentStore[tag];
+        if components is string[] {
+            foreach string component in components {
+                if result != "[" {
+                    result = result + ",";
+                }
+                result = result + component;
+            }
+        }
+        return result + "]";
     }
     
     // DELETE /assets/{tag}/components/{compId} - Remove component
     resource function delete assets/[string tag]/components/[string compId]() returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string[]? components = componentStore[tag];
+        if components is string[] {
+            string[] remaining = [];
+            boolean removed = false;
+            foreach string component in components {
+                if getValue(component, "compId") == compId {
+                    removed = true;
+                } else {
+                    remaining.push(component);
+                }
+            }
+            if !removed {
+                return <http:NotFound>{body: {"error": "Component not found"}};
+            }
+            componentStore[tag] = remaining;
+        } else {
+            return <http:NotFound>{body: {"error": "Component not found"}};
         }
         log:printInfo("Removed component: " + compId);
         return <http:Ok>{body: {"message": "Component removed"}};
