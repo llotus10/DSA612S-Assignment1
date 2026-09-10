@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/log;
+import ballerina/time;
 
 // So what this getvalue function does is it takes a JSON string and a key, and it returns the value associated with that key in the JSON string. It does this by searching for the key in the JSON string and then extracting the value that follows it. If the key is not found, it returns an empty string. This function is used throughout the service to extract values from JSON strings representing assets.
 function getValue(string jsonStr, string key) returns string {
@@ -34,6 +35,14 @@ function getValue(string jsonStr, string key) returns string {
         return "";
     }
     return jsonStr.substring(startPos, endPos);
+}
+
+function isPastDate(string date) returns boolean {
+    time:Utc|time:Error dueDate = time:utcFromString(date + "T00:00:00Z");
+    if dueDate is time:Utc {
+        return dueDate < time:utcNow();
+    }
+    return false;
 }
 
 service /api/library on new http:Listener(9090) {
@@ -146,8 +155,19 @@ service /api/library on new http:Listener(9090) {
         string result = "[";
         int count = 0;
         foreach var entry in assetStore.entries() {
-            string status = getValue(entry[1], "status");
-            if status == "LOANED_OUT" {
+            boolean overdue = false;
+            string[]? schedules = scheduleStore[entry[0]];
+            if schedules is string[] {
+                foreach string schedule in schedules {
+                    string scheduleType = getValue(schedule, "type").toUpperAscii();
+                    string dueDate = getValue(schedule, "dueDate");
+                    if scheduleType == "MAINTENANCE" && isPastDate(dueDate) {
+                        overdue = true;
+                        break;
+                    }
+                }
+            }
+            if overdue {
                 if count > 0 {
                     result = result + ",";
                 }
