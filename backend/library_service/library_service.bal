@@ -318,6 +318,38 @@ service /api/library on new http:Listener(9090) {
         }
         return result + "]";
     }
+
+    // PATCH /assets/{tag}/workorders/{orderId} - Update a work order
+    resource function patch assets/[string tag]/workorders/[string orderId](@http:Payload json workOrderData) returns http:Ok|http:NotFound|http:BadRequest {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string updatedWorkOrder = workOrderData.toJsonString();
+        string status = getValue(updatedWorkOrder, "status").toUpperAscii();
+        if status != "OPEN" && status != "IN_PROGRESS" && status != "CLOSED" {
+            return <http:BadRequest>{body: {"error": "Invalid work order status"}};
+        }
+        string[]? workOrders = workOrderStore[tag];
+        if workOrders is string[] {
+            string[] updatedWorkOrders = [];
+            boolean updated = false;
+            foreach string workOrder in workOrders {
+                if getValue(workOrder, "orderId") == orderId {
+                    updatedWorkOrders.push(updatedWorkOrder);
+                    updated = true;
+                } else {
+                    updatedWorkOrders.push(workOrder);
+                }
+            }
+            if !updated {
+                return <http:NotFound>{body: {"error": "Work order not found"}};
+            }
+            workOrderStore[tag] = updatedWorkOrders;
+            log:printInfo("Updated work order: " + orderId);
+            return <http:Ok>{body: {"message": "Work order updated"}};
+        }
+        return <http:NotFound>{body: {"error": "Work order not found"}};
+    }
     
     // PATCH /assets/{tag}/status - Update status
     resource function patch assets/[string tag]/status(@http:Payload string statusData) returns http:Ok|http:NotFound|http:BadRequest {
