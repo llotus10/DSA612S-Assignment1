@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Library Resource Desk</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="shell">
+        <header class="header">
+            <div>
+                <p class="eyebrow">Ministry resource network</p>
+                <h1>Library Resource Desk</h1>
+                <p class="intro">View assets across institutions and keep maintenance schedules visible.</p>
+            </div>
+            <button id="refreshButton" class="button secondary">Refresh assets</button>
+        </header>
+
+        <section class="toolbar" aria-label="Asset filters">
+            <label>Institution <input id="institutionInput" placeholder="e.g. University of Namibia"></label>
+            <label>Site <input id="siteInput" placeholder="e.g. Main Campus - Library"></label>
+            <button id="filterButton" class="button">Apply filter</button>
+            <button id="overdueButton" class="button warning">Overdue maintenance</button>
+        </section>
+
+        <p id="message" class="message" role="status"></p>
+        <section id="assetGrid" class="asset-grid" aria-live="polite"></section>
+
+        <section class="schedule-panel">
+            <div>
+                <p class="eyebrow">Schedule manager</p>
+                <h2>Add a maintenance schedule</h2>
+            </div>
+            <form id="scheduleForm">
+                <label>Asset tag <input id="assetTagInput" required placeholder="NUST-LIB-3DP-001"></label>
+                <label>Schedule ID <input id="scheduleIdInput" required placeholder="SCH-001"></label>
+                <label>Due date <input id="dueDateInput" required type="date"></label>
+                <label>Description <input id="descriptionInput" required placeholder="Quarterly calibration"></label>
+                <button class="button" type="submit">Add schedule</button>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
