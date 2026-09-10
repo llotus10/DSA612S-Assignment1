@@ -1,8 +1,9 @@
 import ballerina/http;
 import ballerina/log;
 
-// Helper function to extract value from JSON string
+// So what this getvalue function does is it takes a JSON string and a key, and it returns the value associated with that key in the JSON string. It does this by searching for the key in the JSON string and then extracting the value that follows it. If the key is not found, it returns an empty string. This function is used throughout the service to extract values from JSON strings representing assets.
 function getValue(string jsonStr, string key) returns string {
+    //whats happening here is we`re creating a variabe called search and its a string `
     string search = "\"" + key + "\":\"";
     int searchLen = search.length();
     int jsonLen = jsonStr.length();
