@@ -40,6 +40,20 @@
                 <button class="button" type="submit">Add schedule</button>
             </form>
         </section>
+
+        <section class="schedule-panel">
+            <div>
+                <p class="eyebrow">Room and lab booking</p>
+                <h2>Book an available space</h2>
+            </div>
+            <form id="bookingForm">
+                <label>Asset tag <input id="bookingAssetTagInput" required placeholder="IIT-LIB-ROOM-003"></label>
+                <label>Booking ID <input id="bookingIdInput" required placeholder="BOOK-001"></label>
+                <label>Booking date <input id="bookingDateInput" required type="date"></label>
+                <label>Description <input id="bookingDescriptionInput" required placeholder="Student project meeting"></label>
+                <button class="button" type="submit">Book space</button>
+            </form>
+        </section>
     </main>
     <script src="app.js"></script>
 </body>

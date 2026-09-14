@@ -22,19 +22,21 @@ function renderAssets(assets) {
             <p>${asset.institution}</p>
             <p>${asset.site}</p>
             <span class="status">${asset.status}</span>
-            ${asset.status === 'AVAILABLE' ? `<button class="button loan-button" data-tag="${asset.assetTag}">Loan asset</button>` : ''}`;
+            ${asset.status === 'AVAILABLE' ? `<button class="button loan-button" data-action="loan" data-tag="${asset.assetTag}">Loan asset</button>` : ''}
+            ${asset.status === 'LOANED_OUT' ? `<button class="button return-button" data-action="return" data-tag="${asset.assetTag}">Return asset</button>` : ''}`;
         assetGrid.appendChild(card);
     });
 }
 
 assetGrid.addEventListener('click', async (event) => {
-    const button = event.target.closest('.loan-button');
+    const button = event.target.closest('.loan-button, .return-button');
     if (!button) return;
     button.disabled = true;
     try {
-        const response = await fetch(`${apiBase}/assets/${encodeURIComponent(button.dataset.tag)}/loan`, { method: 'PATCH' });
+        const actionPath = button.dataset.action === 'loan' ? 'loan' : 'release';
+        const response = await fetch(`${apiBase}/assets/${encodeURIComponent(button.dataset.tag)}/${actionPath}`, { method: 'PATCH' });
         if (!response.ok) throw new Error(`Request failed (${response.status})`);
-        showMessage('Asset loaned successfully.');
+        showMessage(button.dataset.action === 'loan' ? 'Asset loaned successfully.' : 'Asset returned successfully.');
         loadAssets();
     } catch (error) {
         showMessage(`Asset was not loaned: ${error.message}`);
@@ -87,6 +89,29 @@ document.querySelector('#scheduleForm').addEventListener('submit', async (event)
         loadAssets();
     } catch (error) {
         showMessage(`Schedule was not added: ${error.message}`);
+    }
+});
+
+document.querySelector('#bookingForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const tag = document.querySelector('#bookingAssetTagInput').value.trim();
+    const payload = {
+        bookingId: document.querySelector('#bookingIdInput').value.trim(),
+        type: 'BOOKING',
+        bookingDate: document.querySelector('#bookingDateInput').value,
+        description: document.querySelector('#bookingDescriptionInput').value.trim()
+    };
+    try {
+        const response = await fetch(`${apiBase}/assets/${encodeURIComponent(tag)}/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error(`Request failed (${response.status})`);
+        event.target.reset();
+        showMessage('Space booked successfully.');
+    } catch (error) {
+        showMessage(`Space was not booked: ${error.message}`);
     }
 });
 

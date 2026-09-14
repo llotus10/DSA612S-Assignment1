@@ -38,8 +38,9 @@ input:focus { outline: 2px solid #9dd2c5; border-color: var(--teal); }
 .tag { color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
 .status { display: inline-block; margin-top: 15px; padding: 6px 9px; border-radius: 99px; color: #24564c; background: #dff0e8; font-size: 11px; font-weight: 700; }
 .loan-button { display: block; margin-top: 16px; }
+.return-button { display: block; margin-top: 16px; color: var(--teal-dark); background: #d9ebe4; }
 .schedule-panel { display: grid; grid-template-columns: .8fr 1.2fr; gap: 28px; margin-top: 32px; padding: 25px; }
-#scheduleForm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; align-items: end; }
-#scheduleForm label:last-of-type { grid-column: 1 / -1; }
-#scheduleForm .button { justify-self: start; }
-@media (max-width: 720px) { .header, .schedule-panel { display: block; } .header .button { margin-top: 22px; } .schedule-panel > * + * { margin-top: 25px; } #scheduleForm { grid-template-columns: 1fr; } #scheduleForm label:last-of-type { grid-column: auto; } input { width: 100%; } }
+#scheduleForm, #bookingForm { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; align-items: end; }
+#scheduleForm label:last-of-type, #bookingForm label:last-of-type { grid-column: 1 / -1; }
+#scheduleForm .button, #bookingForm .button { justify-self: start; }
+@media (max-width: 720px) { .header, .schedule-panel { display: block; } .header .button { margin-top: 22px; } .schedule-panel > * + * { margin-top: 25px; } #scheduleForm, #bookingForm { grid-template-columns: 1fr; } #scheduleForm label:last-of-type, #bookingForm label:last-of-type { grid-column: auto; } input { width: 100%; } }

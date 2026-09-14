@@ -223,6 +223,35 @@ service /api/library on new http:Listener(9090) {
         }
         return result + "]";
     }
+
+    // POST /assets/{tag}/bookings - Book an available room or lab
+    resource function post assets/[string tag]/bookings(@http:Payload json bookingData) returns http:Ok|http:NotFound|http:Conflict {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string? assetJson = assetStore[tag];
+        if assetJson is string && getValue(assetJson, "status") != "AVAILABLE" {
+            return <http:Conflict>{body: {"error": "Asset is not available"}};
+        }
+        string bookingJson = bookingData.toJsonString();
+        string bookingDate = getValue(bookingJson, "bookingDate");
+        string[]? storedSchedules = scheduleStore[tag];
+        if storedSchedules is string[] {
+            foreach string schedule in storedSchedules {
+                if getValue(schedule, "type").toUpperAscii() == "BOOKING" && getValue(schedule, "bookingDate") == bookingDate {
+                    return <http:Conflict>{body: {"error": "Asset is already booked for that date"}};
+                }
+            }
+        }
+        string[] schedules = [];
+        if storedSchedules is string[] {
+            schedules = storedSchedules;
+        }
+        schedules.push(bookingJson);
+        scheduleStore[tag] = schedules;
+        log:printInfo("Booked asset: " + tag);
+        return <http:Ok>{body: {"message": "Asset booked"}};
+    }
     
     // POST /assets/{tag}/components - Add component
     resource function post assets/[string tag]/components(@http:Payload json componentData) returns http:Ok|http:NotFound {
@@ -397,6 +426,29 @@ service /api/library on new http:Listener(9090) {
             assetStore[tag] = "{\"assetTag\":\"" + tagVal + "\",\"name\":\"" + name + "\",\"description\":\"" + desc + "\",\"institution\":\"" + inst + "\",\"site\":\"" + site + "\",\"status\":\"LOANED_OUT\",\"dateAcquired\":\"" + date + "\"}";
             log:printInfo("Loaned asset: " + tag);
             return <http:Ok>{body: {"message": "Asset loaned"}};
+        }
+        return <http:NotFound>{body: {"error": "Not found"}};
+    }
+
+    // PATCH /assets/{tag}/release - Return a loaned asset
+    resource function patch assets/[string tag]/release() returns http:Ok|http:NotFound|http:Conflict {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string? currentJson = assetStore[tag];
+        if currentJson is string {
+            if getValue(currentJson, "status") != "LOANED_OUT" {
+                return <http:Conflict>{body: {"error": "Asset is not loaned out"}};
+            }
+            string tagVal = getValue(currentJson, "assetTag");
+            string name = getValue(currentJson, "name");
+            string desc = getValue(currentJson, "description");
+            string inst = getValue(currentJson, "institution");
+            string site = getValue(currentJson, "site");
+            string date = getValue(currentJson, "dateAcquired");
+            assetStore[tag] = "{\"assetTag\":\"" + tagVal + "\",\"name\":\"" + name + "\",\"description\":\"" + desc + "\",\"institution\":\"" + inst + "\",\"site\":\"" + site + "\",\"status\":\"AVAILABLE\",\"dateAcquired\":\"" + date + "\"}";
+            log:printInfo("Returned asset: " + tag);
+            return <http:Ok>{body: {"message": "Asset returned"}};
         }
         return <http:NotFound>{body: {"error": "Not found"}};
     }
