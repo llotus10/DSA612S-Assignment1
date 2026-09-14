@@ -482,35 +482,47 @@ service /api/library on new http:Listener(9091) {
         return <http:NotFound>{body: {"error": "Not found"}};
     }
     
-    // GET /institutions - Get all institutions
+    // GET /institutions - Get all registered institutions
     resource function get institutions() returns string {
         string result = "[";
         int count = 0;
-        string[] seen = [];
-        foreach var entry in assetStore.entries() {
-            string inst = getValue(entry[1], "institution");
-            if inst == "" {
-                continue;
+        foreach var inst in institutionStore.keys() {
+            if count > 0 {
+                result = result + ",";
             }
-            boolean found = false;
-            int idx = 0;
-            while idx < seen.length() {
-                if seen[idx] == inst {
-                    found = true;
-                    break;
-                }
-                idx = idx + 1;
-            }
-            if !found {
-                if count > 0 {
-                    result = result + ",";
-                }
-                result = result + "\"" + inst + "\"";
-                seen.push(inst);
-                count = count + 1;
-            }
+            result = result + "\"" + inst + "\"";
+            count = count + 1;
         }
         result = result + "]";
         return result;
+    }
+
+    // POST /institutions - Register a new institution
+    resource function post institutions(@http:Payload json body) returns http:Created|http:Conflict|http:BadRequest {
+        // We expect: {"name": "Some University"}
+        string|error nameResult = body.name.ensureType(string);
+        if nameResult is error {
+            return <http:BadRequest>{body: {"error": "Missing 'name' field"}};
+        }
+        string name = nameResult;
+        if name == "" {
+            return <http:BadRequest>{body: {"error": "Institution name cannot be empty"}};
+        }
+        if institutionStore.hasKey(name) {
+            return <http:Conflict>{body: {"error": "Institution already exists"}};
+        }
+        institutionStore[name] = name;
+        log:printInfo("Registered institution: " + name);
+        return <http:Created>{body: {"message": "Institution registered", "name": name}};
+    }
+
+    // DELETE /institutions/{name} - Remove a registered institution
+    resource function delete institutions/[string name]() returns http:Ok|http:NotFound {
+        if !institutionStore.hasKey(name) {
+            return <http:NotFound>{body: {"error": "Institution not found"}};
+        }
+        _ = institutionStore.remove(name);
+        log:printInfo("Removed institution: " + name);
+        return <http:Ok>{body: {"message": "Institution removed", "name": name}};
     }
 }
