@@ -47,16 +47,16 @@ function isPastDate(string date) returns boolean {
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["http://localhost:8000"],
+        allowOrigins: ["http://localhost:8001", "http://127.0.0.1:8001"],
         allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type"]
     }
 }
-service /api/library on new http:Listener(9090) {
+service /api/library on new http:Listener(9091) {
     
     function init() {
         initSampleData();
-        log:printInfo("Library System started on port 9090");
+        log:printInfo("Library System started on port 9091");
     }
     
     // GET /assets - Return all assets as JSON string
