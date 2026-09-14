@@ -1,0 +1,14 @@
+[package]
+org = "nust"
+name = "library_client"
+version = "1.0.0"
+authors = ["Your Name"]
+license = ["Apache-2.0"]
+description = "Library Management System CLI Client"
+
+[build-options]
+observabilityIncluded = true
+
+[dependencies]
+"ballerina/http" = "2.10.0"
+"ballerina/io" = "1.6.0"

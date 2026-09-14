@@ -47,8 +47,8 @@ function isPastDate(string date) returns boolean {
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["http://localhost:8001", "http://127.0.0.1:8001"],
-        allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allowOrigins: ["*"],
+        allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type"]
     }
 }
@@ -75,15 +75,16 @@ service /api/library on new http:Listener(9091) {
     }
     
     // POST /assets - Create asset
-    resource function post assets(@http:Payload string assetData) returns http:Created|http:Conflict|http:BadRequest {
-        string tag = getValue(assetData, "assetTag");
+    resource function post assets(@http:Payload json assetData) returns http:Created|http:Conflict|http:BadRequest {
+        string assetStr = assetData.toJsonString();
+        string tag = getValue(assetStr, "assetTag");
         if tag == "" {
             return <http:BadRequest>{body: {"error": "Invalid asset tag"}};
         }
         if assetStore.hasKey(tag) {
             return <http:Conflict>{body: {"error": "Asset already exists"}};
         }
-        assetStore[tag] = assetData;
+        assetStore[tag] = assetStr;
         log:printInfo("Created: " + tag);
         return <http:Created>{body: {"message": "Created", "assetTag": tag}};
     }
@@ -101,11 +102,11 @@ service /api/library on new http:Listener(9091) {
     }
     
     // PUT /assets/{tag} - Update asset
-    resource function put assets/[string tag](@http:Payload string assetData) returns http:Ok|http:NotFound {
+    resource function put assets/[string tag](@http:Payload json assetData) returns http:Ok|http:NotFound {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
         }
-        assetStore[tag] = assetData;
+        assetStore[tag] = assetData.toJsonString();
         log:printInfo("Updated: " + tag);
         return <http:Ok>{body: {"message": "Updated"}};
     }
@@ -454,11 +455,12 @@ service /api/library on new http:Listener(9091) {
     }
     
     // PATCH /assets/{tag}/status - Update status
-    resource function patch assets/[string tag]/status(@http:Payload string statusData) returns http:Ok|http:NotFound|http:BadRequest {
+    resource function patch assets/[string tag]/status(@http:Payload json statusData) returns http:Ok|http:NotFound|http:BadRequest {
         if !assetStore.hasKey(tag) {
             return <http:NotFound>{body: {"error": "Not found"}};
         }
-        string newStatus = getValue(statusData, "newStatus");
+        string statusStr = statusData.toJsonString();
+        string newStatus = getValue(statusStr, "newStatus");
         if newStatus == "" {
             return <http:BadRequest>{body: {"error": "Invalid status"}};
         }

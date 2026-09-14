@@ -10,23 +10,78 @@
     <main class="shell">
         <header class="header">
             <div>
-                <p class="eyebrow">Ministry resource network</p>
+                <p class="eyebrow">Ministry of Higher Education, Training and Innovations</p>
                 <h1>Library Resource Desk</h1>
-                <p class="intro">View assets across institutions and keep maintenance schedules visible.</p>
+                <p class="intro">Track books, electronic equipment, and physical spaces across all registered institutions.</p>
             </div>
             <button id="refreshButton" class="button secondary">Refresh assets</button>
         </header>
 
+        <!-- Search and Filters -->
         <section class="toolbar" aria-label="Asset filters">
-            <label>Institution <input id="institutionInput" placeholder="e.g. University of Namibia"></label>
-            <label>Site <input id="siteInput" placeholder="e.g. Main Campus - Library"></label>
+            <label>Institution 
+                <input id="institutionInput" placeholder="e.g. University of Namibia" list="institutionDatalist">
+                <datalist id="institutionDatalist"></datalist>
+            </label>
+            <label>Site / Campus 
+                <input id="siteInput" placeholder="e.g. Main Campus - Library">
+            </label>
             <button id="filterButton" class="button">Apply filter</button>
+            <button id="clearFilterButton" class="button secondary">Clear</button>
             <button id="overdueButton" class="button warning">Overdue maintenance</button>
         </section>
 
+        <!-- Status / Feedback Message -->
         <p id="message" class="message" role="status"></p>
+
+        <!-- Assets Grid -->
         <section id="assetGrid" class="asset-grid" aria-live="polite"></section>
 
+        <!-- Section: Add New Asset -->
+        <section class="schedule-panel">
+            <div>
+                <p class="eyebrow">Resource registration</p>
+                <h2>Add a new asset</h2>
+            </div>
+            <form id="addAssetForm">
+                <label>Asset tag <input id="newAssetTag" required placeholder="NUST-LIB-3DP-002"></label>
+                <label>Name <input id="newAssetName" required placeholder="Dell Latitude 5420"></label>
+                <label>Description <input id="newAssetDesc" placeholder="Core i7 Laptop for Lab"></label>
+                <label>Institution 
+                    <input id="newAssetInst" required placeholder="Namibia University of Science and Technology" list="institutionDatalist">
+                </label>
+                <label>Site / Campus <input id="newAssetSite" required placeholder="Main Campus - Library"></label>
+                <label>Date acquired <input id="newAssetDate" type="date" required></label>
+                <label>Status
+                    <select id="newAssetStatus">
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="LOANED_OUT">LOANED_OUT</option>
+                        <option value="UNDER_MAINTENANCE">UNDER_MAINTENANCE</option>
+                        <option value="DISPOSED">DISPOSED</option>
+                    </select>
+                </label>
+                <button class="button" type="submit">Add asset</button>
+            </form>
+        </section>
+
+        <!-- Section: Manage Institutions -->
+        <section class="schedule-panel">
+            <div>
+                <p class="eyebrow">Institution listings</p>
+                <h2>Manage institutions</h2>
+                <p class="sub-text">Add or remove registered higher learning institutions.</p>
+                <div id="institutionList" class="badge-list"></div>
+            </div>
+            <form id="institutionForm">
+                <label>Institution name <input id="instNameInput" required placeholder="e.g. Welwitchia University"></label>
+                <div class="button-row">
+                    <button class="button" type="submit" id="addInstBtn">Register institution</button>
+                    <button class="button warning" type="button" id="removeInstBtn">Remove institution</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section: Schedule Manager -->
         <section class="schedule-panel">
             <div>
                 <p class="eyebrow">Schedule manager</p>
@@ -41,6 +96,7 @@
             </form>
         </section>
 
+        <!-- Section: Room and Lab Booking -->
         <section class="schedule-panel">
             <div>
                 <p class="eyebrow">Room and lab booking</p>
@@ -52,6 +108,27 @@
                 <label>Booking date <input id="bookingDateInput" required type="date"></label>
                 <label>Description <input id="bookingDescriptionInput" required placeholder="Student project meeting"></label>
                 <button class="button" type="submit">Book space</button>
+            </form>
+        </section>
+
+        <!-- Section: Work Orders & Repairs -->
+        <section class="schedule-panel">
+            <div>
+                <p class="eyebrow">Fault tracking</p>
+                <h2>Open a work order</h2>
+            </div>
+            <form id="workOrderForm">
+                <label>Asset tag <input id="woAssetTagInput" required placeholder="NUST-LIB-3DP-001"></label>
+                <label>Order ID <input id="woOrderIdInput" required placeholder="WO-101"></label>
+                <label>Status
+                    <select id="woStatusSelect">
+                        <option value="OPEN">OPEN</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="CLOSED">CLOSED</option>
+                    </select>
+                </label>
+                <label>Description <input id="woDescriptionInput" required placeholder="Nozzle heater replacement"></label>
+                <button class="button" type="submit">Create work order</button>
             </form>
         </section>
     </main>
