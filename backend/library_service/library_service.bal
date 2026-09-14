@@ -377,6 +377,29 @@ service /api/library on new http:Listener(9090) {
         }
         return <http:NotFound>{body: {"error": "Work order not found"}};
     }
+
+    // PATCH /assets/{tag}/loan - Loan an available asset
+    resource function patch assets/[string tag]/loan() returns http:Ok|http:NotFound|http:Conflict {
+        if !assetStore.hasKey(tag) {
+            return <http:NotFound>{body: {"error": "Not found"}};
+        }
+        string? currentJson = assetStore[tag];
+        if currentJson is string {
+            if getValue(currentJson, "status") != "AVAILABLE" {
+                return <http:Conflict>{body: {"error": "Asset is not available"}};
+            }
+            string tagVal = getValue(currentJson, "assetTag");
+            string name = getValue(currentJson, "name");
+            string desc = getValue(currentJson, "description");
+            string inst = getValue(currentJson, "institution");
+            string site = getValue(currentJson, "site");
+            string date = getValue(currentJson, "dateAcquired");
+            assetStore[tag] = "{\"assetTag\":\"" + tagVal + "\",\"name\":\"" + name + "\",\"description\":\"" + desc + "\",\"institution\":\"" + inst + "\",\"site\":\"" + site + "\",\"status\":\"LOANED_OUT\",\"dateAcquired\":\"" + date + "\"}";
+            log:printInfo("Loaned asset: " + tag);
+            return <http:Ok>{body: {"message": "Asset loaned"}};
+        }
+        return <http:NotFound>{body: {"error": "Not found"}};
+    }
     
     // PATCH /assets/{tag}/status - Update status
     resource function patch assets/[string tag]/status(@http:Payload string statusData) returns http:Ok|http:NotFound|http:BadRequest {

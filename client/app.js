@@ -21,10 +21,26 @@ function renderAssets(assets) {
             <p>${asset.description || 'No description provided.'}</p>
             <p>${asset.institution}</p>
             <p>${asset.site}</p>
-            <span class="status">${asset.status}</span>`;
+            <span class="status">${asset.status}</span>
+            ${asset.status === 'AVAILABLE' ? `<button class="button loan-button" data-tag="${asset.assetTag}">Loan asset</button>` : ''}`;
         assetGrid.appendChild(card);
     });
 }
+
+assetGrid.addEventListener('click', async (event) => {
+    const button = event.target.closest('.loan-button');
+    if (!button) return;
+    button.disabled = true;
+    try {
+        const response = await fetch(`${apiBase}/assets/${encodeURIComponent(button.dataset.tag)}/loan`, { method: 'PATCH' });
+        if (!response.ok) throw new Error(`Request failed (${response.status})`);
+        showMessage('Asset loaned successfully.');
+        loadAssets();
+    } catch (error) {
+        showMessage(`Asset was not loaned: ${error.message}`);
+        button.disabled = false;
+    }
+});
 
 async function loadAssets(path = '/assets') {
     showMessage('Loading assets...');
