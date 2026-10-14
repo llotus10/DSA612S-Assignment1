@@ -2,7 +2,7 @@
 org = "nust"
 name = "library_client"
 version = "1.0.0"
-authors = ["Your Name"]
+authors = ["George, Reinholdt, , Tjatjitua"]
 license = ["Apache-2.0"]
 description = "Library Management System CLI Client"
 
