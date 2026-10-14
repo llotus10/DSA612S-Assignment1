@@ -2,7 +2,7 @@
 org = "nust"
 name = "library_service"
 version = "1.0.0"
-authors = ["Your Name"]
+authors = ["George, Reinholdt, Tjatjitua"]
 license = ["Apache-2.0"]
 description = "Library Management System"
 
